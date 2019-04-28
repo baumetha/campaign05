@@ -11,7 +11,7 @@ public interface Graph<V, E> {
     int numVertices();
 
     /** Returns an iteration of all the vertices of the graph */
-    Iterator<Vertex<V>> vertices();
+    Iterator<V> vertices();
 
     /** Returns the number of edges of the graph */
     int numEdges();
