@@ -3,62 +3,78 @@ package edu.isu.cs.cs3308.structures.impl;
 import edu.isu.cs.cs3308.structures.Graph;
 import edu.isu.cs.cs3308.structures.Edge;
 import edu.isu.cs.cs3308.structures.Vertex;
+import edu.isu.cs.cs3308.structures.impl.InnerEdge;
+import edu.isu.cs.cs3308.structures.impl.InnerVertex;
 
 import java.util.*;
 
 /**
- * Code heavily influenced by in class and book examples
+ * Code heavily influenced by in class examples
  * @param <V>
  * @param <E>
  */
 public abstract class Graphimpl<V, E> implements Graph<V, E> {
-    private LinkedList<Vertex<V>> vertices = new LinkedList<>();
-    private LinkedList<Edge<E>> edges = new LinkedList<>();
+
+    Map<V, List<Edge<V, E>>> adjMap;
 
     /**
      * number of vertices in the graph
      *
-     * @return
+     * @return number of vertices
      */
     @Override
     public int numVertices() {
-        return vertices.size();
+        return adjMap.keySet().size();
     }
 
     /**
      * vertices of the graph
      *
-     * @return
+     * @return iteration of vertices in graph
      */
     @Override
-    public Iterator<Vertex<V>> vertices() {
-        return vertices;
+    public Iterator<V> vertices() {
+        return adjMap.keySet().iterator();
     }
 
     /**
      * number of edges in graph
      *
-     * @return
+     * @return number of edges
      */
     @Override
     public int numEdges() {
-        edges.size();
+        int[] sum = {0};
+        adjMap.values().forEach(v -> {
+            sum[0] += v.size();
+        });
+        return sum[0];
     }
 
     /**
-     * The edges in the graph
+     * The edges in the graphs
      *
-     * @return
+     * @return iteration of all edges
      */
     @Override
-    public Iterable<Edge<E>> edges() {
-        return edges;
-/**
- * finds the edge
- */
-        public Edge<E> getEdge(Vertex < V > u, Vertex < V > v){
+    public Iterator<Edge<V, E>> edges() {
+        List<Edge<V, E>> edges = new ArrayList<>();
+        for (List<Edge<V, E>> list : adjMap.values())
+            edges.addAll(list);
+        return edges.iterator();
+    }
+
+    /**
+     * finds the edge from vertex v to vertex u
+     */
+    public Edge<V, E> getEdge(Vertex<V, E> v, Vertex<V, E> u) {
+        if (v == null || u == null){
             return null;
+    }
+        if (adjMap.containsKey(v)) {
+            for (Edge<V, E> edge : adjMap.get(v));
         }
+        return null;
     }
 
     /**
@@ -67,173 +83,141 @@ public abstract class Graphimpl<V, E> implements Graph<V, E> {
      * @param e
      * @return
      */
-    @Override
-    public Vertex<V>[] endVertices(Edge<E> e) {
-        return e.getEndpoints();
+/**
+    public V[] endVertices(Edge<V,E> e) {
+        return null;
     }
-
+*/
     /**
+     * Must store in a temp
      * @param v
      * @param e
      * @return vertex that is opposite vertex v on the edge
      */
-    public V opposite(Vertex<V> v, Edge<E> e) {
-        Vertex<V>[] endpoints = e.getEndpoints();
-        if (endpoints[0] == v)
-            return endpoints[1];
-        else if (endpoints[1] == v)
-            return endpoints[0];
-        else
-            throw new IllegalArgumentException();
+    public V opposite(V v, Edge<V,E> e) {
+        if (v != null && e != null) {
+            InnerEdge<V, E> edge = (InnerEdge) e;
+            if (edge.getDest().equals(v))
+                return edge.getSrc();
+            else return edge.getDest();
+        }
+        return null;
+    }
 
         /**
-         * Based off book
+         *
          * @param v
          * @return number of edges which is the origin
          */
-        public int outDegree (Vertex < V > v) {
-            return v.getOutgoing().size();
+        public int outDegree (V v) {
+            if (v != null && adjMap.containsKey(v))
+                return adjMap.get(v).size();
+            return 0;
         }
 
         /**
-         * Based off book
+         *
          * @param v
          * @return the number of edges which is the destination
          */
-        public int inDegree (Vertex < V > v) {
-            return v.getIncoming().size();
+        public int inDegree ( V v) {
+            int inDegree = 0;
+            if (v != null) {
+                for (V k : adjMap.keySet()) {
+                    if (!k.equals(v)) {
+                  //      InnerEdge<V, E> e = new InnerEdge<V, E>(k, v,null);
+                       // if (adjMap.get(k).contains(e)) ;
+                        inDegree++;
+                    }
+                }
+            }
+            return inDegree;
         }
-
         /**
-         * Based off book
+         * Must store in a temp
          * @param v
          * @return Iterable collection of edges where v is the origin
          */
-        public Iterator<Edge<E>> outgoingEdges (Vertex < V > v) {
-            Vertex<V> ver = v;
-            return (Iterator<Edge<E>>) ver.getOutgoing();
+        public Iterator<Edge<V,E>> outgoingEdges (Vertex < V,E > v) {
+            if (v != null && adjMap.containsKey(v)) {
+                return adjMap.get(v).iterator();
+            }
+            return null;
         }
 
         /**
-         * based off book
+         * must store in a temp
          * @param v
          * @return Iterable collection of edges where v is the destination
          */
 
-        public Iterable<Edge<E>> incomingEdges (Vertex < V > v) {
-            return v.getIncoming();
+        public Iterator<Edge<V,E>> incomingEdges (Vertex<V,E> v) {
+            List<Edge<V,E>> edges = new ArrayList<>();
+            if (v != null){
+                for (V k : adjMap.keySet()){
+                    if (k.equals(v)) {
+                        for (Edge<V, E> edge : adjMap.get(k)) {
+                            InnerEdge temp = (InnerEdge)edge;
+                            if (temp.getDest().equals(v))
+                                edges.add(edge);
+                        }
+                    }
+                }
+            }
+            return edges.iterator();
         }
 /**
  * Inserts a new vertex
  */
 
-        public Vertex<V> insertVertex (V v){
-            Vertex<V> vert = new InnerVertex(v);
-            vertices.add(vert);
-            return vert;
-
+        public Vertex<V,E> insertVertex (V v){
+            if (v != null && !adjMap.containsKey(v))
+                adjMap.put(v, new LinkedList<>());
+                return (Vertex<V, E>) v;
         }
 /**
  * inserts a new edge
+ * Must store in a temp
  */
-
-        public void insertEdge (Vertex < V > u, Vertex < V > v, E e){
-
+        public void insertEdge (Vertex<V,E> u, Vertex<V,E> v, E e){
+            if (v == null || u == null)
+                return;
+            if (adjMap.containsKey(v)){
+                List<Edge<V,E>> edges = adjMap.get(v);
+                InnerEdge<V,E> edge = new InnerEdge<>(v,u,e);
+                if (!adjMap.get(v).contains(edge))
+                    adjMap.get(v).add(edge);
+            }
         }
 /**
  * removes a vertex
+ * Must store in a temp
  */
-        public V removeVertex (Vertex < V > v) {
-            for (Edge e : v.getOutgoing()) {
-                removeEdge(e);
+        public void removeVertex ( V v) {
+            if (v != null) {
+                if (adjMap.containsKey(v))
+                    adjMap.remove(v);
+                List<Edge<V, E>> edges = new ArrayList<>();
+                for (List<Edge<V, E>> list : adjMap.values()) {
+                    for (Edge<V, E> e : list) {
+                        InnerEdge temp = (InnerEdge) e;
+                        if (temp.getDest().equals(v))
+                            edges.add(e);
+                    }
+                }
+                for (Edge<V, E> edge : edges) {
+                    InnerEdge e = (InnerEdge) edge;
+                    adjMap.get(e.getSrc()).remove(edge);
+                }
             }
-            for (Edge e : v.getIncoming()) {
-                removeEdge(e);
-            }
-            V elem = v.getElement();
-            return elem;
         }
 /**
  * removes an edge
  */
-        public E removeEdge (Edge < E > e) {
-            return null;
-        }
-        /**
-         * Nested Vertex class
-         */
-        public class InnerVertex implements Vertex<E> {
-            /**
-             * Implmentation of the Vertex interface
-             * Somewhat based on in-book example
-             *
-             * @param <V>
-             */
-            public class Verteximpl<V> implements Vertex<V> {
-                public V element;
-                public List<Edge<E>> outgoing;
-                public List<Edge<E>> incoming;
-
-                public Verteximpl(V elem) {
-                    this.element = element;
-                    incoming = new LinkedList<>();
-                    outgoing = new LinkedList<>();
-                }
-
-                @Override
-                public V getElement() {
-                    return element;
-                }
-
-                @Override
-                public <E> List<Edge<E>> getOutgoing() {
-                    return outgoing;
-                }
-
-                @Override
-                public <E> List<Edge<E>> getIncoming() {
-                    return incoming;
-                }
+    public void removeEdge (InnerEdge<V,E> e) {
+            if (e != null){
+                if (adjMap.containsKey(e.getSrc()))
+                    adjMap.get(e.getSrc()).remove(e);
             }
         }
     }
-        /**
-         * Nested Edge class
-         */
-    public class InnerEdge implements Edge<E>{
-        /**
-         * Written based on code from in class
-         * @author Isaac Griffith
-         * @author Ethan Baumgartner
-         * @param <V>
-         * @param <E>
-         */
-            V src;
-            V dest;
-            E element;
-            Vertex<V>[] endpoints;
-            public InnerEdge(Vertex<V> u, Vertex<V> v, E elem) {
-                element = elem;
-                endpoints = (Vertex<V>[]) new Vertex[]{u, v};
-            }
-            public int hashCode(){
-                return Objects.hash(getSrc(), getDest());
-            }
-
-            public V getSrc() {
-                return src;
-            }
-
-            public V getDest(){
-                return dest;
-            }
-            @Override
-            public E getElement() {
-                return element;
-            }
-            @Override
-            public <V> Vertex<V>[] getEndpoints() {
-                return null;
-        }
-    }
-}

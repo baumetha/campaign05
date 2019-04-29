@@ -17,50 +17,50 @@ public interface Graph<V, E> {
     int numEdges();
 
     /** Returns an iteration of all edges of the graph */
-    Iterator<Edge<E>> edges();
+    Iterator<Edge<V,E>> edges();
 
     /** Returns the edge from vertex u to vertex v, if one exists, otherwise returns null.
      *  For an undirected graph, there is no difference between getEdge(u, v) and getEdge(v, u)
      */
-    Edge<E> getEdge(V u, V v);
+    Edge<V,E> getEdge(V u, V v);
 
     /** Returns an array containing the two endpoint vertices of edge e. If the graph is directed
      *  the first vertex is the origin and the second is the destination.
      */
-    Vertex<V>[] endVertices(Edge<E> e);
+    Vertex<V,E>[] endVertices(Edge<V,E> e);
 
     /** For edge e incident to vertex v, returns the other vertex of the edge; an error occurs
      *  if e is not incident to v.
      */
-    V opposite(Vertex<V> v, Edge<E> e);
+    V opposite(Vertex<V,E> v, Edge<V,E> e);
 
     /** Returns the number of outgoing edges from vertex v. */
-    int outDegree(Vertex<V> v);
+    int outDegree(Vertex<V,E> v);
 
     /** Returns the number of incoming edges to vertex v. For an undirected graph, this returns
     *  the same value as does outDegree(v)
     */
-    int inDegree(Vertex<V> v);
+    int inDegree(Vertex<V,E> v);
 
     /** Returns an iteration of all outgoing edges from vertex v */
-    Iterator<Edge<E>> outgoingEdges(Vertex<V> v);
+    Iterator<Edge<V,E>> outgoingEdges(Vertex<V,E> v);
 
     /** Returns an iteration of all incoming edges to vertex v. For an undirected graph, this
      *  returns the same collection as does outgoingEdges(v)
      */
-    Iterator<Edge<E>> incomingEdges(Vertex<V> v);
+    Iterator<Edge<V,E>> incomingEdges(Vertex<V,E> v);
 
     /** Creates and returns a new Vertex storing element v */
-    Vertex<V> insertVertex(V v);
+    Vertex<V,E> insertVertex(V v);
 
     /** Creates and returns a new Edge from vertex u to vertex v, storing element e; an error occurs
      * if there already exists an edge from u to v
      */
-    void insertEdge(Vertex<V> u, Vertex<V> v, E e);
+    void insertEdge(Vertex<V,E> u, Vertex<V,E> v, E e);
 
     /** Removes vertex v and all its incident edges from the graph */
-    V removeVertex(Vertex<V> v);
+    V removeVertex(Vertex<V,E> v);
 
     /** Removes edge e from the graph */
-    E removeEdge(Edge<E> e);
+    void removeEdge(Edge<V,E> e);
 }
